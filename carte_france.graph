@@ -1,0 +1,12 @@
+nb_sommets nb_arcs
+noms sommets
+0000 Abbesses
+0001 Alexandre Dumas
+0375 �tienne Marcel
+coord sommets
+0000 308 536
+0001 472 386
+0375 347 412
+arcs values
+0 238 41
+0 159 46

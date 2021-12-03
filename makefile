@@ -3,7 +3,7 @@ OBJ=graph_basic.o graph_print.o graph_algos.o graphaux.o
 
 # version LINUX:
 CC = g++
-CCFLAGS = -g -DLINUX
+CCFLAGS = -g -DLINUX -Wall
 
 # version HP-UX: 
 #CC = cc
@@ -38,4 +38,4 @@ dijkstra: graphes.h graphaux.o dijkstra.c
 	$(CC) $(CCFLAGS) dijkstra.c graphaux.o graphes.h graph_basic.c -o Dijkstra
 
 Aetoile: graphes.h graphaux.o Aetoile.c
-	$(CC) $(CCFLAGS) Aetoile.c graphaux.o graphes.h graph_basic.c -o AEtoile
+	$(CC) $(CCFLAGS) Aetoile.c graphaux.o graphes.h graph_basic.c vdc.c vdc.h -o AEtoile
