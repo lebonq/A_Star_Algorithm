@@ -34,13 +34,13 @@ pnode ExtractFirstOpen(pnode Open){
 		return NULL;
 	}
 	
-	double estim_f_min = Open->estim_f;
+	long estim_f_min = Open->estim_f;
 	
 	pnode n_min = Open;
 	pnode n_next = Open->next;
 	
 	while(n_next != NULL){
-		double test = n_next->estim_f;
+		long test = n_next->estim_f;
 		if(test < estim_f_min) {
 			estim_f_min = test;
 			n_min = n_next;
@@ -206,23 +206,22 @@ pnode DevelopNode(pnode p, graphe* G){
             // si il n'est pas deja dans le noeud
             // et il existe un arc
 
-
             pnode newnode = AllocNode(p->n);
-            memcpy(newnode, p, sizeof(*p)); // node d'avant
+            //memcpy(newnode, p, sizeof(*p)); // node d'avant
 
-            newnode->len = (newnode->len)+1;  // +1 sommet
+            
+            newnode->len = (p->len)+1;  // +1 sommet
 
             memcpy(newnode->listsom,p->listsom,sizeof(int) * p->n); // liste sommets d'avant
-            newnode->listsom[newnode->len] = i; // +1 sommet
-
+            newnode->listsom[newnode->len-1] = i; // +1 sommet
 
             newnode->estim_g = newnode->estim_g + get_distance(p->listsom[p->len-1],i,G);
             newnode->estim_f = ComputeH(newnode, G, 1, NULL) ;
             // MAJ des estimations
 
-           // it_res->next = (pnode)calloc(1,sizeof(newnode));
-            //memcpy(it_res->next,newnode,sizeof(newnode));  // ajoute node next
-            it_res->next = newnode;
+            it_res->next = (pnode)calloc(1,sizeof(*newnode));
+            memcpy(it_res->next,newnode,sizeof(*newnode));  // ajoute node next
+            //it_res->next = newnode;
             it_res = it_res->next;
 
         }
@@ -288,22 +287,18 @@ pnode AStar(int n, graphe *G, int code){
         while(ITd->next != NULL){ // on ajoute les noeuds possibles a LO
             if(ITd->listsom[ITd->len - 1] == 0 && ITd->len != n){ //Si Pour une node : Listsom[len-1] = start->som et len != n (pas tt les villes parcourues)
                 ITd = ITd->next; // on passe a la possibilité suivante
-                printf("If n°1\n");
                 continue;
             }
 
             if(ITd->len == n && ITd->listsom[ITd->len - 1] != 0){ //Si Pour une node len = n et Listsom[n-1] != start->som (pas revenu au debut)
                 ITd = ITd->next; // on passe a la possibilité suivante
-                printf("If n°2\n");
                 continue;
             }
 
             appendTo(ITLO, ITd->next,&TLO);
             ITd = ITd->next;
             
-        }     
-        exit(-1); 
-        printf("hi\n");
+        }
         
         N->next = ExtractFirstOpen(LO);
         N = N->next;
@@ -353,20 +348,23 @@ int main(int argc, char **argv)
     start->len = 1;
     pnode dev = DevelopNode(start,G);
 
-    while(dev != NULL){
-        printf("Listsom : ");
-        for(int i = 0;i<dev->len;i++){
-            printf("%d, ",dev->listsom[i]);
-            printf("%d, ",dev->len);
+    pnode d = AllocNode(G->nsom);
+    memcpy(d,dev,sizeof(*dev));
+
+    while(d != NULL){
+       // printf("Listsom : ");
+        for(int i = 0;i<(d->len);i++){
+           // printf("Itération %d = %d, ",i,d->listsom[i]);
         }
-        printf("\n");
-        printf("%p=%p\n",(void *)&dev, (void *)&dev->next);
-        dev = dev->next;
+        
+        //printf("\nlen = %d\n",d->len);
+        d = d->next;
         
     }
 
+    
 
-    //pnode res = AStar(G->nsom,G,0);
-    //PrintSolution(res,G);
+    pnode res = AStar(G->nsom,G,0);
+    PrintSolution(res,G);
 	return 0;
 } // main()
