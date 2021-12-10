@@ -14,9 +14,9 @@
     \brief alloue un nouveau noeud
 */
 pnode AllocNode(int n){
-	pnode new_node = (pnode)malloc(sizeof(node));
+	pnode new_node = (pnode)calloc(1,sizeof(node));
 	new_node->n = n;
-    new_node->listsom = (int*)malloc(sizeof(int)*n);
+    new_node->listsom = (int*)calloc(n,sizeof(int));
     new_node->estim_g = 0;
     new_node->estim_f = 0;
     new_node->len = 0;
@@ -57,14 +57,20 @@ pnode ExtractFirstOpen(pnode Open){
 
 
 /* ====================================================================== */
-/*! \fn void PrintSolution(pnode p, double *arc)
+/*! \fn void PrintSolution(pnode p, graphe *G)
     \param p : pointeur sur le noeud sélectionné à la profondeur n-1
-    \param arc : table des distances entre villes
+    \param G : le graphe
     \brief affiche la solution à l'écran (le circuit et son coût)
 */
-
-
-
+void PrintSolution(pnode P, graphe* G){
+    
+    printf("Chemin optimal :\n");
+    for (int i = 0; i < P->len; i++)
+    {
+        printf("%d -> ",P->listsom[i]);
+    }
+    printf("\nFin :-)\n");
+}
 /* ====================================================================== */
 /*! \fn int NotInListSom(int s, pnode p)
     \param p : un noeud
@@ -75,6 +81,7 @@ int NotInListSom(int s, pnode p){
 	for(int i = 0; i< p->len; i++){
 		if(som[i] == s) return 0;
 	}
+
 	return 1;
 
 }
@@ -87,7 +94,7 @@ int NotInListSom(int s, pnode p){
     \return la distance entre 2 sommets, si l'arc existe
     \brief regarde si une distance existe entre 2 sommets, et la retourne.
 */
-double get_distance(int a, int b, graphe* G){
+long get_distance(int a, int b, graphe* G){
     pcell cellA = G->gamma[a];
     pcell cellB = G->gamma[b];
 
@@ -126,15 +133,15 @@ double get_vol(int a, int b, graphe* G){
 }
 
 
-double arcmin(int s, graphe* G){
-    pcell it_som = G->gamma[s]->next;
-    double val = get_distance(s,it_som->som,G);
-    it_som = it_som->next;
+long arcmin(int s, graphe* G){
+    pcell it_som = G->gamma[s];
+    long val = LONG_MAX;
 
     while(it_som != NULL){
         if(get_distance(s,it_som->som,G) < val){
             val = get_distance(s,it_som->som,G);
         }
+        it_som = it_som->next;
     }
 
     return val;
@@ -152,31 +159,54 @@ double arcmin(int s, graphe* G){
     \return : valeur de l'heuristique pour ce noeud
     \brief calcule l'heuristique pour le noeud p
 */
-double ComputeH(pnode p, graphe* G, int code, int *rest){
+long ComputeH(pnode p, graphe* G, int code, int *rest){
     p->estim_f = p->estim_g;
-    for(int i = 0; i<p->n - p->len;i++){
-        p->estim_f = p->estim_f + arcmin(i,G); // fonction H
+    switch(code){
+        // heuristique : g + distance sommet le + proche
+        case 1:
+            for (int i = 0; i < G->nsom; i++)
+            {
+                if(NotInListSom(i,p)){
+                    p->estim_f = p->estim_f + arcmin(p->listsom[p->len-1],G); // fonction H
+                }
+            }
+            
+            break;
 
+
+
+
+        /* arbre poids minimum ici #KrusKalForever*/
+        case 2:
+
+
+            break;
+
+        default:
+            break;
     }
 
     return p->estim_f;
 }
 
+
 /* ====================================================================== */
 /*! \fn pnode DevelopNode(pnode p, graphe* G, int som_end)
     \param p : un noeud
     \param G : table des distances entre villes
-    \param som_end : somment d'arrivée
     \return la liste des nouveaux noeuds créés
     \brief construit la liste des noeuds successeurs sur noeud p dans le GRP
 */
-pnode DevelopNode(pnode p, graphe* G, int som_end){
+pnode DevelopNode(pnode p, graphe* G){
     pnode it_res = p;
 
     for(int i = 0; i<G->nsom; i++){ //on parcours tous les sommets dans le graph
         if(NotInListSom(i,p) && get_distance(p->listsom[p->len-1],i,G)!=-1) {
+            printf("Weight entre %d et %d = %li\n", p->listsom[p->len-1], i,get_distance(p->listsom[p->len-1],i,G));
             // si il n'est pas deja dans le noeud
             // et il existe un arc
+
+
             pnode newnode = AllocNode(p->n);
             memcpy(newnode, p, sizeof(*p)); // node d'avant
 
@@ -186,16 +216,17 @@ pnode DevelopNode(pnode p, graphe* G, int som_end){
             newnode->listsom[newnode->len] = i; // +1 sommet
 
 
-            newnode->estim_g = newnode->estim_g + get_distance(p->listsom[p->len],i,G);
+            newnode->estim_g = newnode->estim_g + get_distance(p->listsom[p->len-1],i,G);
             newnode->estim_f = ComputeH(newnode, G, 1, NULL) ;
             // MAJ des estimations
 
-            it_res->next = newnode;  // ajoute node next
-            it_res = newnode;
+           // it_res->next = (pnode)calloc(1,sizeof(newnode));
+            //memcpy(it_res->next,newnode,sizeof(newnode));  // ajoute node next
+            it_res->next = newnode;
+            it_res = it_res->next;
 
         }
     }
-
     return p->next;
 
 }
@@ -218,13 +249,87 @@ pnode Catenate(pnode p, pnode q){
 	return p;
 }
 
+void appendTo(pnode L, pnode N, int* size){
+    L->next = N;
+    L = L->next;
+    *size = *size + 1;
+}
+
 /* ====================================================================== */
-/*! \fn void AStar(int n, double *arc, int code)
+/*! \fn pnode AStar(int n, double *arc, int code)
     \param n : nombre de villes
     \param arc : table des distances entre villes
     \param code : le code de l'heuristique (choix parmi différentes possibilités)
     \brief algorithme A* pour le voyageur de commerce
 */
+pnode AStar(int n, graphe *G, int code){
+
+    // Liste ouverte
+    pnode LO = AllocNode(n);
+    int TLO = 0; //-> taille LO
+
+    // Iterateur sur la liste ouverte
+    pnode ITLO = LO;
+    
+    // Initialisation
+    
+    pnode N = AllocNode(n); // nouveau noeud pour le départ
+    N->listsom[0] = 0;
+    N->len= 1;
+
+    appendTo(ITLO,N,&TLO); // ajoute N a la LO
+
+    while(TLO > 0 || (N->len == n && N->listsom[N->len - 1] != 0)){ //On s'arrete quand pour la node actuelle len = n et listsom[len-1] = start->som et estimf < à tous les autres (autrement dit si Extractmachin ressort la même node que celle actuelle)
+
+        pnode developement = DevelopNode(N,G); // les nodes suivantes possibles (liste chainée)
+        pnode ITd = developement; // itération sur tt les possibilités
+        
+        
+        while(ITd->next != NULL){ // on ajoute les noeuds possibles a LO
+            if(ITd->listsom[ITd->len - 1] == 0 && ITd->len != n){ //Si Pour une node : Listsom[len-1] = start->som et len != n (pas tt les villes parcourues)
+                ITd = ITd->next; // on passe a la possibilité suivante
+                printf("If n°1\n");
+                continue;
+            }
+
+            if(ITd->len == n && ITd->listsom[ITd->len - 1] != 0){ //Si Pour une node len = n et Listsom[n-1] != start->som (pas revenu au debut)
+                ITd = ITd->next; // on passe a la possibilité suivante
+                printf("If n°2\n");
+                continue;
+            }
+
+            appendTo(ITLO, ITd->next,&TLO);
+            ITd = ITd->next;
+            
+        }     
+        exit(-1); 
+        printf("hi\n");
+        
+        N->next = ExtractFirstOpen(LO);
+        N = N->next;
+        N->len = N->len + 1;
+        TLO--;
+    }
+    
+    return N;
+    
+    //N la node final
+}
+
+void AfficherArcs(graphe* G){
+    for (int i = 0; i < G->nsom-1; i++)
+    {
+        pcell start = G->gamma[i];
+        while (start != NULL)
+        {
+            printf("Arc de %d à %d = %li\n",i, start->som,start->v_arc);
+            start = start->next;
+        }
+        
+    }
+}
+    
+
 
 /* ====================================================================== */
 /*! \fn double tailleGRP(int n)
@@ -234,11 +339,34 @@ pnode Catenate(pnode p, pnode q){
 */
 
 /* ====================================================================== */
-//int main(int argc, char **argv)
+int main(int argc, char **argv)
 /* ====================================================================== */
-/*{
-	graphe* G = ReadGraphe("test_dijkstra.graph");
-    pnode list_node = (pnode)malloc(sizeof(node));
-    
+{
+  
+    char graphname[50] = "carte_france.graph";
+	graphe* G = ReadGraphe(graphname);
+
+    //AfficherArcs(G);
+
+    pnode start = AllocNode(G->nsom);
+    start->listsom[0] = 0;
+    start->len = 1;
+    pnode dev = DevelopNode(start,G);
+
+    while(dev != NULL){
+        printf("Listsom : ");
+        for(int i = 0;i<dev->len;i++){
+            printf("%d, ",dev->listsom[i]);
+            printf("%d, ",dev->len);
+        }
+        printf("\n");
+        printf("%p=%p\n",(void *)&dev, (void *)&dev->next);
+        dev = dev->next;
+        
+    }
+
+
+    //pnode res = AStar(G->nsom,G,0);
+    //PrintSolution(res,G);
 	return 0;
-} // main()*/
+} // main()

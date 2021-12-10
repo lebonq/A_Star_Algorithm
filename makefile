@@ -11,13 +11,8 @@ CCFLAGS = -g -DLINUX -Wall
 
 obj:	$(OBJ)
 
-doc:	graphes.dox $(SRC)
-	doxygen graphes.dox; mv doc/html/* Html/doc
-
 clean:
 	rm -f $(OBJ); rm -f *.exe
-
-.SUFFIXES:	.exe
 
 .c.exe:	
 	$(CC) $(CCFLAGS) $< $(OBJ) -lm -o $@
@@ -34,8 +29,5 @@ graph_print.o:	graphes.h graphaux.h graph_print.c
 graph_algos.o:	graphes.h graphaux.h graph_algos.c
 	$(CC) $(CCFLAGS) -c graph_algos.c
 
-dijkstra: graphes.h graphaux.o dijkstra.c
-	$(CC) $(CCFLAGS) dijkstra.c graphaux.o graphes.h graph_basic.c -o Dijkstra
-
-Aetoile: graphes.h graphaux.o Aetoile.c
-	$(CC) $(CCFLAGS) Aetoile.c graphaux.o graphes.h graph_basic.c vdc.c vdc.h -o AEtoile
+Aetoile: graphes.h graphaux.o
+	$(CC) $(CCFLAGS) graphaux.o graphes.h graph_basic.c vdc.c vdc.h -o AEtoile.exe

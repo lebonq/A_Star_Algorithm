@@ -10,7 +10,7 @@
 
 /* ==================================== */
 /*! \fn Lifo * CreeLifoVide(int taillemax)
-    \param taillemax (entrée) : taille maxi de la liste.
+    \param taillemax (entrï¿½e) : taille maxi de la liste.
     \return une liste Lifo.
     \brief alloue une liste vide.
 */
@@ -29,8 +29,8 @@ Lifo * CreeLifoVide(int taillemax)
 
 /* ==================================== */
 /*! \fn void LifoFlush(Lifo * L)
-    \param L (entrée) : une liste Lifo.
-    \brief ré-initialise L (tous les éléments présents sont retirés).
+    \param L (entrï¿½e) : une liste Lifo.
+    \brief rï¿½-initialise L (tous les ï¿½lï¿½ments prï¿½sents sont retirï¿½s).
 */
 void LifoFlush(Lifo * L)
 /* ==================================== */
@@ -40,7 +40,7 @@ void LifoFlush(Lifo * L)
 
 /* ==================================== */
 /*! \fn boolean LifoVide(Lifo * L)
-    \param L (entrée) : une liste Lifo.
+    \param L (entrï¿½e) : une liste Lifo.
     \return TRUE si la liste \b L est vide, FALSE sinon.
     \brief teste si la liste \b est vide.
 */
@@ -52,10 +52,10 @@ boolean LifoVide(Lifo * L)
 
 /* ==================================== */
 /*! \fn int LifoPop(Lifo * L)
-    \param L (entrée) : une liste Lifo.
-    \return la valeur se trouvant en début de liste.
-    \brief retire de la liste \b L la valeur se trouvant au début, et retourne cette valeur.
-    \warning si la liste \b L est vide, la fonction système \b exit est appelée.
+    \param L (entrï¿½e) : une liste Lifo.
+    \return la valeur se trouvant en dï¿½but de liste.
+    \brief retire de la liste \b L la valeur se trouvant au dï¿½but, et retourne cette valeur.
+    \warning si la liste \b L est vide, la fonction systï¿½me \b exit est appelï¿½e.
 */
 int LifoPop(Lifo * L)
 /* ==================================== */
@@ -71,9 +71,9 @@ int LifoPop(Lifo * L)
   
 /* ==================================== */
 /*! \fn void LifoPush(Lifo * L, int V)
-    \param L (entrée) : une liste Lifo.
-    \brief insère au début de la liste \b L la valeur \b V
-    \warning si la liste \b L est pleine, la fonction système \b exit est appelée.
+    \param L (entrï¿½e) : une liste Lifo.
+    \brief insï¿½re au dï¿½but de la liste \b L la valeur \b V
+    \warning si la liste \b L est pleine, la fonction systï¿½me \b exit est appelï¿½e.
 */
 void LifoPush(Lifo * L, int V)
 /* ==================================== */
@@ -89,7 +89,7 @@ void LifoPush(Lifo * L, int V)
 
 /* ==================================== */
 /*! \fn void LifoPrint(Lifo * L)
-    \param L (entrée) : une liste Lifo.
+    \param L (entrï¿½e) : une liste Lifo.
     \brief affiche le contenu de la liste \b L.
 */
 void LifoPrint(Lifo * L)
@@ -105,7 +105,7 @@ void LifoPrint(Lifo * L)
 
 /* ==================================== */
 /*! \fn void LifoPrintLine(Lifo * L)
-    \param L (entrée) : une liste Lifo.
+    \param L (entrï¿½e) : une liste Lifo.
     \brief affiche le contenu de la liste \b L, suivi d'un retour ligne.
 */
 void LifoPrintLine(Lifo * L)
@@ -124,8 +124,8 @@ void LifoPrintLine(Lifo * L)
 
 /* ==================================== */
 /*! \fn void LifoTermine(Lifo * L)
-    \param L (entrée) : une liste Lifo.
-    \brief récupère l'espace mémoire occupé par la liste \b L.
+    \param L (entrï¿½e) : une liste Lifo.
+    \brief rï¿½cupï¿½re l'espace mï¿½moire occupï¿½ par la liste \b L.
 */
 void LifoTermine(Lifo * L)
 /* ==================================== */
@@ -188,10 +188,10 @@ int PartitionStochastique(int *A, TypeCle *T, int p, int r)
 
 /* =============================================================== */
 /*! \fn void TriRapideStochastique (int * A, TypeCle *T, int p, int r)
-    \param A (entrée/sortie) : un tableau d'entiers
-    \param T (entrée) : un tableau de valeurs de type TypeCle.
-    \param p (entrée) : indice du début de la zone à trier.
-    \param r (entrée) : indice de fin de la zone à trier.
+    \param A (entrï¿½e/sortie) : un tableau d'entiers
+    \param T (entrï¿½e) : un tableau de valeurs de type TypeCle.
+    \param p (entrï¿½e) : indice du dï¿½but de la zone ï¿½ trier.
+    \param r (entrï¿½e) : indice de fin de la zone ï¿½ trier.
     \brief tri par ordre croissant des valeurs du tableau \b T.
            Le tri s'effectue sur un tableau \b A contenant les index
            des elements de \b T, l'indice \b p (compris) a l'indice \b r (compris).
@@ -216,8 +216,8 @@ void TriRapideStochastique (int * A, TypeCle *T, int p, int r)
 
 /* ==================================== */
 /*! \fn void start_chrono(chrono *tp)
-    \param tp (sortie) : date du début du chronométrage
-    \brief démarre le chronométrage
+    \param tp (sortie) : date du dï¿½but du chronomï¿½trage
+    \brief dï¿½marre le chronomï¿½trage
 */
 void start_chrono(chrono *tp)
 /* ==================================== */
@@ -230,9 +230,9 @@ void start_chrono(chrono *tp)
 
 /* ==================================== */
 /*! \fn int read_chrono(chrono *tp)
-    \param tp (entrée) : date du début du chronométrage
-    \return nombre de microsecondes écoulées depuis le début
-    \brief lecture du chronomètre
+    \param tp (entrï¿½e) : date du dï¿½but du chronomï¿½trage
+    \return nombre de microsecondes ï¿½coulï¿½es depuis le dï¿½but
+    \brief lecture du chronomï¿½tre
 */
 int read_chrono(chrono *tp)
 /* ==================================== */
@@ -355,11 +355,11 @@ void PSDrawdisc (FILE *fd, double x, double y, double r)
 void PSString (FILE *fd, double x, double y, char *s)
 /*========================================*/
 {
-  int xx, yy, rr;
+  /*int xx, yy, rr;
   xx = (int)x;
-  yy = (int)y;
+  yy = (int)y;*/
   fprintf(fd, "newpath ");
-  fprintf(fd, "%d %d moveto ", xx, yy);
+  //fprintf(fd, "%d %d moveto ", xx, yy);
   fprintf(fd, "(%s)o ", s);
   fprintf(fd, "stroke\n");
 } /* PSString() */
@@ -378,9 +378,9 @@ void PSFooter(FILE *fd)
 
 /* ====================================================================== */
 /*! \fn boolean * EnsembleVide(int n)
-    \param n (entrée) : taille du tableau booléen.
-    \return un tableau de \b n booléens, tous égaux à FALSE.
-    \brief alloue et initialise un tableau de \b n booléens, représentant l'ensemble vide.
+    \param n (entrï¿½e) : taille du tableau boolï¿½en.
+    \return un tableau de \b n boolï¿½ens, tous ï¿½gaux ï¿½ FALSE.
+    \brief alloue et initialise un tableau de \b n boolï¿½ens, reprï¿½sentant l'ensemble vide.
 */
 boolean * EnsembleVide(int n)
 /* ====================================================================== */

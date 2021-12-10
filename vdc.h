@@ -3,9 +3,9 @@
 */
 typedef struct node {
 //! estimation de la quantité g
-  double estim_g;
+  long estim_g;
 //! estimation de la fonction d'évaluation
-  double estim_f;
+  long estim_f;
 //! chemin sur la carte routière : liste de sommets (villes)
   int *listsom;
 //! nombre de villes dans le chemin courant
