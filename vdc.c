@@ -49,7 +49,8 @@ pnode ExtractFirstOpen(pnode Open){
 		n_next = n_next->next;
 	}
 	
-	pnode le_return = n_min;
+	pnode le_return = AllocNode(n_min->n);
+    memcpy(le_return,n_min,sizeof(*n_min));
 	n_min = n_min->next;
 	
 	return le_return;
