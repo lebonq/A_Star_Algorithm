@@ -93,7 +93,16 @@ typedef struct graphe {
   double *y;        
 //!  noms des sommets 
   char **nomsommet; 
+
+//! tableau de sommets initiaux des aretes
+  int* I;
+  //! tableau de sommets terminaux des aretes
+  int* T;
+  //! ponderation des aretes
+  double *poids;
+  
 } graphe;
+
 
 /* ================================================ */
 /* prototypes */

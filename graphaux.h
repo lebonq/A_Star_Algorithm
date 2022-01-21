@@ -28,7 +28,7 @@ typedef struct Lifo {
   int Max;
 //! index de pile (pointe la 1ere case libre)
   int Sp;
-//! tableau pour la pile (re-dimensionné dynamiquement)
+//! tableau pour la pile (re-dimensionnï¿½ dynamiquement)
   int Pts[1];
 } Lifo;
 

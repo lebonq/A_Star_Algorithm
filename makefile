@@ -1,33 +1,20 @@
-SRC=graph_basic.c graph_print.c graph_algos.c graphaux.c
-OBJ=graph_basic.o graph_print.o graph_algos.o graphaux.o
+OBJ=graphaux.o
 
 # version LINUX:
 CC = g++
 CCFLAGS = -g -DLINUX -Wall
 
-# version HP-UX: 
-#CC = cc
-#CCFLAGS = -g -DHP -Aa -DDEFTIMEVAL
+all:
+	make Aetoile
 
 obj:	$(OBJ)
 
 clean:
-	rm -f $(OBJ); rm -f *.exe
-
-.c.exe:	
-	$(CC) $(CCFLAGS) $< $(OBJ) -lm -o $@
+	rm -f $(OBJ);
 
 graphaux.o:	graphes.h graphaux.h graphaux.c
 	$(CC) $(CCFLAGS) -c graphaux.c
 
-graph_basic.o:	graphes.h graphaux.h graph_basic.c
-	$(CC) $(CCFLAGS) -c graph_basic.c
-
-graph_print.o:	graphes.h graphaux.h graph_print.c
-	$(CC) $(CCFLAGS) -c graph_print.c
-
-graph_algos.o:	graphes.h graphaux.h graph_algos.c
-	$(CC) $(CCFLAGS) -c graph_algos.c
-
 Aetoile: graphes.h graphaux.o
-	$(CC) $(CCFLAGS) graphaux.o graphes.h graph_basic.c vdc.c vdc.h -o AEtoile.exe
+	$(CC) $(CCFLAGS) graphaux.o graphes.h graph_basic.c vdc.c vdc.h kruskal.c kruskal.h -o AEtoile.exe
+	make clean

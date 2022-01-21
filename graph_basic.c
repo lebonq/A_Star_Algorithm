@@ -6,6 +6,7 @@
 */
 #include "graphaux.h"
 #include "graphes.h"
+#include <time.h>
 
 /* ====================================================================== */
 /* ====================================================================== */
@@ -160,6 +161,10 @@ graphe * InitGraphe(int nsom, int nmaxarc)
       exit(0);
   }
 
+  g->I = (int*)calloc(nmaxarc, sizeof(int));
+  g->T = (int*)calloc(nmaxarc, sizeof(int));
+  g->poids= (double*)calloc(nmaxarc, sizeof(double));
+
   g->nsom = nsom;
   g->nmaxarc = nmaxarc;
   g->narc = 0;
@@ -183,7 +188,9 @@ graphe * InitGraphe(int nsom, int nmaxarc)
 void TermineGraphe(graphe * g)
 /* ====================================================================== */
 {
+  
   int i, n = g->nsom;
+  
   free(g->reserve);
   if (g->gamma) free(g->gamma);
   if (g->tete) { free(g->tete); free(g->queue); }
@@ -194,6 +201,13 @@ void TermineGraphe(graphe * g)
     for (i = 0; i < n; i++) free(g->nomsommet[i]);
     free(g->nomsommet);
   }
+  
+  free(g->x);
+  free(g->y);
+  free(g->I);
+  free(g->T);
+  free(g->poids);
+  
   free(g);
 } /* TermineGraphe() */
 
@@ -269,6 +283,9 @@ graphe * ReadGraphe(char * filename)
       {
         fscanf(fd, "%d %d %lf\n", &t, &q, &v);
         AjouteArcValue(g, t, q, (TYP_VARC)v);
+        g->I[i] = t;
+        g->T[i] = q;
+        g->poids[i] = v;
       }
     } /*  if ((ret != NULL) && (strncmp(buf, "arcs values", 11) == 0)) */
     else if ((ret != NULL) && (strncmp(buf, "arcs", 4) == 0))
@@ -392,7 +409,7 @@ graphe * GrapheAleatoire(int nsom, int narc)
   graphe * g;
   int i, j, m;
   double mmax = ((double)nsom * ((double)nsom - 1)) / 2;
-
+  srand(time(0));
   if (narc > mmax)
   {
     fprintf(stderr, "GrapheAleatoire : pas plus de %g arcs pour %d sommets\n", 
@@ -412,9 +429,14 @@ graphe * GrapheAleatoire(int nsom, int narc)
         j = rand() % nsom;
       } while ((i == j) || EstSuccesseur(g, i, j) || EstSuccesseur(g, j, i));
       AjouteArc(g, i, j);
+      g->I[narc] = i;
+      g->T[narc] = j;
       g->tete[narc] = i;
       g->queue[narc] = j;
-      if (g->v_arcs) g->v_arcs[narc] = (TYP_VARC)(rand()*100.0);
+      if (g->v_arcs){
+        g->v_arcs[narc] = (TYP_VARC)(rand()*100.0);
+        g->poids[narc] = g->v_arcs[narc];
+      } 
     }
   }
   else /* on part du graphe complet et on retire des arcs au hasard */
@@ -422,8 +444,56 @@ graphe * GrapheAleatoire(int nsom, int narc)
     /* construit un graphe complet antisymetrique sans boucle */
     g = InitGraphe(nsom, (int)mmax);
     for (i = 0; i < nsom ; i++)
-      for (j = i+1; j < nsom; j++)
-        AjouteArc(g, i, j);         
+      for (j = i+1; j < nsom; j++){
+        AjouteArc(g, i, j);  
+      }
+
+    // autre
+    int listeNbArcs[nsom][nsom];
+    for(int k = 0; k<nsom; k++){
+      listeNbArcs[k][k] = 0;
+    }
+
+    i = 0;
+    j = 0;
+    int d = 0;
+    for(int na = 0; na<narc; na++){
+      int nbmin = INT_MAX;
+      for(d = 0; d<nsom; d++){
+        int nbactuel;
+        for(int a=0; a<nsom;a++){
+          nbactuel+=listeNbArcs[d][a];
+        }
+        if(nbactuel <= nbmin) nbmin = nbactuel;        
+      } // nb min d'arcs partant d'un sommet
+
+      int nbSomAConsiderer = 0;
+      for(d = 0; d<nsom; d++){
+        int nbactuel;
+        for(int a=0; a<nsom;a++){
+          nbactuel+=listeNbArcs[d][a];
+        }
+        if(nbactuel == nbmin) nbSomAConsiderer;        
+      } // nb de sommet qui possiblement gagnent un arc ce tour
+
+      int listeSomAConsiderer[nbSomAConsiderer];
+      int c = 0;
+      for(d = 0; d<nsom; d++){
+        int nbactuel;
+        for(int a=0; a<nsom;a++){
+          nbactuel+=listeNbArcs[d][a];
+        }
+        if(nbactuel == nbmin){
+          listeSomAConsiderer[c] = d;
+          c++;
+        }
+      } // liste des sommets qui peuvent gagner un arc
+
+      // 2 random sur listeSomAConsiderer
+      AjouteArc(g,rand() % nbSomAConsiderer,rand() % nbSomAConsiderer;
+    }
+
+               
 
     /* retire mmax - narc arcs */
     m = (int)mmax;
@@ -443,12 +513,12 @@ graphe * GrapheAleatoire(int nsom, int narc)
     for (i = 0; i < nsom ; i++)
       for (j = i+1; j < nsom; j++)
         if (EstSuccesseur(g, i, j))
-	{
+	      {
           g->tete[m] = i;
           g->queue[m] = j;
           if (g->v_arcs) g->v_arcs[narc] = (TYP_VARC)(rand()*100.0);
           m++;
-	}
+	      }
   }
 
   return g;

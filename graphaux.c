@@ -147,13 +147,17 @@ void LifoTermine(Lifo * L)
     des elements de T.
 **************************************************/
 
-/* =============================================================== */
-int Partitionner(int *A, TypeCle *T, int p, int r)
-/* =============================================================== */
-/*
-  partitionne les elements de A entre l'indice p (compris) et l'indice r (compris)
-  en deux groupes : les elements q tq T[A[q]] <= T[A[p]] et les autres.
+/* ====================================================================== */
+/*! \fn int Partitionner(int *A, double *T, int p, int r)
+    \param A : tableau de int
+    \param T : tableau de valeurs
+    \param p : indice sur le tableau T
+    \param r : indice sur le tableau T
+    \return un indice sur A
+    \brief partitionne les elements de A entre l'indice p (compris) et l'indice r (compris) 
+          en deux groupes : les elements q tq T[A[q]] <= T[A[p]] et les autres.
 */
+int Partitionner(int *A, TypeCle *T, int p, int r)
 {
   int t;
   TypeCle x = T[A[p]];
@@ -168,14 +172,19 @@ int Partitionner(int *A, TypeCle *T, int p, int r)
   } /* while (1) */   
 } /* Partitionner() */
 
-/* =============================================================== */
-int PartitionStochastique(int *A, TypeCle *T, int p, int r)
-/* =============================================================== */
-/*
-  partitionne les elements de A entre l'indice p (compris) et l'indice r (compris)
-  en deux groupes : les elements k tels que T[A[k]] <= T[A[q]] et les autres, 
-  avec q tire au hasard dans [p,r].
+
+/* ====================================================================== */
+/*! \fn int PartitionStochastique(int *A, double *T, int p, int r)
+    \param A : tableau de int
+    \param T : tableau de valeurs
+    \param p : indice sur le tableau T
+    \param r : indice sur le tableau T
+    \return un indice sur A
+    \brief partitionne les elements de A entre l'indice p (compris) et l'indice r (compris)
+          en deux groupes : les elements k tels que T[A[k]] <= T[A[q]] et les autres, 
+          avec q tire au hasard dans [p,r].
 */
+int PartitionStochastique(int *A, TypeCle *T, int p, int r)
 {
   int t, q;
 
