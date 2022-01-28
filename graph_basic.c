@@ -7,6 +7,8 @@
 #include "graphaux.h"
 #include "graphes.h"
 #include <time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 /* ====================================================================== */
 /* ====================================================================== */
@@ -392,9 +394,10 @@ int EstSuccesseur(graphe *g, int i, int s)
 /* ====================================================================== */
 
 /* ====================================================================== */
-/*! \fn graphe * GrapheAleatoire(int nsom, int narc)
+/*! \fn graphe * GrapheAleatoire(int nsom, int narc, int code)
     \param nsom (entr�e) : nombre de sommets.
     \param narc (entr�e) : nombre d'arcs.
+    \param code (entrée) : disposition des arcs
     \return un graphe.
     \brief retourne un graphe al�atoire � 'nsom' sommets et 'narc' arcs. 
               Le graphe est antisym�trique et sans boucle.
@@ -403,13 +406,13 @@ int EstSuccesseur(graphe *g, int i, int s)
     \warning la m�thode employ�e ici est na�ve, tres inefficace du point de vue
               temps de calcul et ne garantit aucune propri�t� statistique. 
 */
-graphe * GrapheAleatoire(int nsom, int narc)
+graphe * GrapheAleatoire(int nsom, int narc, int code)
 /* ====================================================================== */
 {
   graphe * g;
   int i, j, m;
   double mmax = ((double)nsom * ((double)nsom - 1)) / 2;
-  srand(time(0));
+  srand(time(NULL)+getpid());
   if (narc > mmax)
   {
     fprintf(stderr, "GrapheAleatoire : pas plus de %g arcs pour %d sommets\n", 
@@ -447,50 +450,90 @@ graphe * GrapheAleatoire(int nsom, int narc)
       for (j = i+1; j < nsom; j++){
         AjouteArc(g, i, j);  
       }
-
+    
     // autre
-    int listeNbArcs[nsom][nsom];
-    for(int k = 0; k<nsom; k++){
-      listeNbArcs[k][k] = 0;
+
+    if(code==1){
+
+     int** listeNbArcs = (int**)calloc(sizeof(int*),nsom);
+
+      for(int k = 0; k<nsom; k++){
+        listeNbArcs[k] = (int*)calloc(sizeof(int),nsom);
+      }
+
+      i = 0;
+      j = 0;
+      int d = 0;
+      for(int na = 0; na<narc; na++){
+        int nbmin = INT_MAX;
+        for(d = 0; d<nsom; d++){
+          int nbactuel;
+          for(int a=0; a<nsom;a++){
+            nbactuel+=listeNbArcs[d][a];
+          }
+          if(nbactuel <= nbmin) nbmin = nbactuel;        
+        } // nb min d'arcs partant d'un sommet
+
+        int nbSomAConsiderer = 0;
+        for(d = 0; d<nsom; d++){
+          int nbactuel = 0;
+          for(int a=0; a<nsom;a++){
+            nbactuel+=listeNbArcs[d][a];
+          }
+          if(nbactuel == nbmin) nbSomAConsiderer++;        
+        } // nb de sommet qui possiblement gagnent un arc ce tour
+
+        int listeSomAConsiderer[nbSomAConsiderer];
+        int c = 0;
+        for(d = 0; d<nsom; d++){
+          int nbactuel;
+          for(int a=0; a<nsom;a++){
+            nbactuel+=listeNbArcs[d][a];
+          }
+          if(nbactuel == nbmin){
+            listeSomAConsiderer[c] = d;
+            c++;
+          }
+        } // liste des sommets qui peuvent gagner un arc
+
+        // 2 random sur listeSomAConsiderer
+
+        int sommet1 = listeSomAConsiderer[rand() % nbSomAConsiderer];
+        int sommet2 = listeSomAConsiderer[rand() % nbSomAConsiderer];
+        while(EstSuccesseur(g,sommet1,sommet2) || EstSuccesseur(g,sommet2,sommet1)){
+          sommet2 = listeSomAConsiderer[rand() % nbSomAConsiderer];
+        }
+        AjouteArc(g,sommet1,sommet2);
+        listeNbArcs[sommet1][sommet2] = 1;
+        listeNbArcs[sommet2][sommet1] = 1;
+      }
+    
+      for(int k = 0; k<nsom; k++){
+        free(listeNbArcs[k]);
+      }
+      free(listeNbArcs);
+      return g;
     }
+    
+    // autre 2
+    if(code == 2){
+      int k;
+      for(k = 0; k<nsom-1; k++){
+        AjouteArc(g,k,k+1);
+      }
+      AjouteArc(g,k,0);
 
-    i = 0;
-    j = 0;
-    int d = 0;
-    for(int na = 0; na<narc; na++){
-      int nbmin = INT_MAX;
-      for(d = 0; d<nsom; d++){
-        int nbactuel;
-        for(int a=0; a<nsom;a++){
-          nbactuel+=listeNbArcs[d][a];
+      int nplus = narc - nsom;
+      for(int y = 0; y<nplus;y++){
+        int sommet1 = rand() % nsom;
+        int sommet2 = rand() % nsom;
+        while(EstSuccesseur(g,sommet1,sommet2) || EstSuccesseur(g,sommet2,sommet1)){
+          sommet2 = rand() % nsom;
         }
-        if(nbactuel <= nbmin) nbmin = nbactuel;        
-      } // nb min d'arcs partant d'un sommet
-
-      int nbSomAConsiderer = 0;
-      for(d = 0; d<nsom; d++){
-        int nbactuel;
-        for(int a=0; a<nsom;a++){
-          nbactuel+=listeNbArcs[d][a];
-        }
-        if(nbactuel == nbmin) nbSomAConsiderer;        
-      } // nb de sommet qui possiblement gagnent un arc ce tour
-
-      int listeSomAConsiderer[nbSomAConsiderer];
-      int c = 0;
-      for(d = 0; d<nsom; d++){
-        int nbactuel;
-        for(int a=0; a<nsom;a++){
-          nbactuel+=listeNbArcs[d][a];
-        }
-        if(nbactuel == nbmin){
-          listeSomAConsiderer[c] = d;
-          c++;
-        }
-      } // liste des sommets qui peuvent gagner un arc
-
-      // 2 random sur listeSomAConsiderer
-      AjouteArc(g,rand() % nbSomAConsiderer,rand() % nbSomAConsiderer;
+        AjouteArc(g,sommet1,sommet2);
+      }
+      
+      return g;
     }
 
                

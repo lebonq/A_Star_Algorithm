@@ -457,14 +457,15 @@ void AfficherArcs(graphe* G){
         
     }
 }
-graphe* randomConnexeGraphe(int n, int m){
-    graphe* G = GrapheAleatoire(n,m);
+graphe* randomConnexeGraphe(int n, int m,int code){
+    graphe* G = GrapheAleatoire(n,m,code);
     while(!(isConnexe(G,0))){
         free(G); // eliminer le new graphe si il est pas utile
-        G = GrapheAleatoire(n,m);
+        G = GrapheAleatoire(n,m,code);
     }
     return G;
 }
+
 
 /* ====================================================================== */
 int main(int argc, char **argv)
@@ -508,7 +509,7 @@ int main(int argc, char **argv)
                 struct timeval start,end;
                 pnode res = NULL;
                 do{
-                    G = randomConnexeGraphe(j,nb_arc);
+                    G = randomConnexeGraphe(j,nb_arc,0);
                              
                     if(code == 2){ // si on fait du kruskal
                         ArbrePoidsMin = initGraphMin(G,&poidsArbreMin);
@@ -521,12 +522,12 @@ int main(int argc, char **argv)
                     if(code == 2){ // si on fait du kruskal
                         TermineGraphe(ArbrePoidsMin);
                     }
+                    TermineGraphe(G);
                 }while(res == NULL);
 
                 PrintSolution(res,G);
                 freeNode(res);
-                TermineGraphe(G);
-
+                
                 values[i] = ((double) ((1000000 * end.tv_sec + end.tv_usec)- (1000000 * start.tv_sec + start.tv_usec)));
                 
             }
@@ -572,7 +573,7 @@ int main(int argc, char **argv)
                     struct timeval start,end;
                     pnode res = NULL;
                     do{
-                        G = randomConnexeGraphe(j,nb_arc);
+                        G = randomConnexeGraphe(j,nb_arc,1);
                                 
                         if(code == 2){ // si on fait du kruskal
                             ArbrePoidsMin = initGraphMin(G,&poidsArbreMin);
@@ -585,11 +586,11 @@ int main(int argc, char **argv)
                         if(code == 2){ // si on fait du kruskal
                             TermineGraphe(ArbrePoidsMin);
                         }
+                        TermineGraphe(G);
                     }while(res == NULL);
 
                     PrintSolution(res,G);
                     freeNode(res);
-                    TermineGraphe(G);
 
                     values[i] = ((double) ((1000000 * end.tv_sec + end.tv_usec)- (1000000 * start.tv_sec + start.tv_usec)));
                     
@@ -606,9 +607,9 @@ int main(int argc, char **argv)
             
                 sprintf(line,"%d;%d;%f\n",j,nb_arc,mean/1000000);
                 fprintf(fout1,"%s", line);
-                fclose(fout1);
                 free(values);
             }
+            fclose(fout1);
         }
     }
     else{
